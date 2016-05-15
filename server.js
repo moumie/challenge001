@@ -6,6 +6,7 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 1337;
 var mongo = require('mongodb').MongoClient;
+var path = __dirname + '/public/';
 
 server.listen(port, function () {
   console.log('Server listening at port %d', port);
@@ -16,6 +17,32 @@ console.log('   app listening on http://' + addr.address + ':' + addr.port);
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/node_modules'));
+
+// added routing
+router.use(function (req,res,next) {
+  console.log("/" + req.method);
+  next();
+});
+
+router.get("/",function(req,res){
+  res.sendFile(path + "index.html");
+});
+
+router.get("/about",function(req,res){
+  res.sendFile(path + "about.html");
+});
+
+router.get("/contact",function(req,res){
+  res.sendFile(path + "contact.html");
+});
+
+app.use("/",router);
+
+app.use("*",function(req,res){
+  res.sendFile(path + "404.html");
+});
+
+// added routing ends here
 
 // Chatroom
 
