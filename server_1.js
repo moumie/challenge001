@@ -1,11 +1,13 @@
 // Setup basic express server
 var express = require('express');
 var app = express();
+var router = express.Router();
 var server = require('http').createServer(app);
 //var io = require('../..')(server);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 1337;
 var mongo = require('mongodb').MongoClient;
+var path =app.use(express.static(__dirname + '/public'));
 
 
 server.listen(port, function () {
@@ -15,10 +17,35 @@ var addr = server.address();
 console.log('   app listening on http://' + addr.address + ':' + addr.port);
 // Routing
 
-app.use(express.static(__dirname + '/public'));
+//app.use(express.static(__dirname + '/public'));
+app.use(path);
 app.use(express.static(__dirname + '/node_modules'));
 
+// added routing
+router.use(function (req,res,next) {
+  console.log("/" + req.method);
+  next();
+});
 
+router.get("/",function(req,res){
+  res.sendFile(path + "index.html");
+});
+
+router.get("/about",function(req,res){
+  res.sendFile(path + "about.html");
+});
+
+router.get("/contact",function(req,res){
+  res.sendFile(path + "contact.html");
+});
+
+app.use("/",router);
+
+app.use("*",function(req,res){
+  res.sendFile(path + "404.html");
+});
+
+// added routing ends here
 
 // Chatroom
 
